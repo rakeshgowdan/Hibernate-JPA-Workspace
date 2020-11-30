@@ -1,0 +1,298 @@
+JPA
+
+Java Persistence API 
+
+JPA is a Java API specification for relational data 
+management in applications using Java SE and Java EE. 
+
+JPA defines a standard way for simplifying database 
+programming for developers, reduce development time and 
+increase productivity.
+
+When using JPA, you have to import interfaces and classes 
+from the package javax.persistence.
+
+JPA defines Java Persistence Query Language (JPQL) which is 
+an object-oriented query language. 
+
+The syntax of JPQL is similar to SQL but it operates against 
+Java objects rather than directly with database tables.
+
+Remember JPA is a specification, 
+and Hibernate is one of its implementations, 
+among others such as EclipseLink and OpenJPA.
+
+HIBERNATE Framework
+Hibernate is a popular Object Relational Mapping (ORM) framework 
+that aims at simplifying database programming for developers.
+
+Hibernate was developed before JPA. 
+And after JPA becomes a standard, 
+Hibernate restructures itself to become an implementation of JPA.
+
+The Hibernate framework consists of several components: 
+Hibernate ORM, 
+Hibernate Search, 
+Hibernate Validator, 
+Hibernate CGM and Hibernate Tools.
+
+
+Hibernate ORM which is the core component of the Hibernate framework,
+for mapping Java model classes to tables in a relational database.
+----------------------------------------------------------------------
+
+Steps 
+1. create a db
+    create database hibernatedemodb;
+	
+2.create a table name users with 4 columns: user_id, fullname, email and password
+
+CREATE TABLE `users` (
+  `user_id` int(11) NOT NULL AUTO_INCREMENT,
+  `fullname` varchar(45) NOT NULL,
+   `email` varchar(45) NOT NULL, 
+  `password` varchar(45) NOT NULL, 
+  PRIMARY KEY (`user_id`)
+)
+Note that the column user_id is the table’s primary key and it is auto-increment.
+
+3. setup the maven project
+ -->add hibernate-core & connector
+ <dependencies>
+    <dependency>
+        <groupId>org.hibernate</groupId>
+        <artifactId>hibernate-core</artifactId>
+        <version>5.2.12.Final</version>
+    </dependency>
+    <dependency>
+        <groupId>mysql</groupId>
+        <artifactId>mysql-connector-java</artifactId>
+        <version>8.0.8-dmr</version>
+    </dependency>
+</dependencies>
+
+4.create the model class[POJO (Plain Old Java Object)]  i.e user
+
+5.we will use JPA annotations to map this table to the corresponding table 
+in the database.
+
+ANNOTATIONS
+@Entity
+This annotation indicates that the class is mapped to a database table.
+ 
+By default, the ORM framework understands that the class name is as same
+as the table name. 
+ 
+The @Entity annotation must be placed before the class definition
+
+@Entity
+public class User {
+…
+}
+
+@Table
+This annotation is used if the class name is different than
+the database table name, and it is must placed before the 
+class definition. 
+Since the class name is User and the table name is Users, 
+we have to use this annotation:
+
+@Entity
+@Table(name = "USERS")
+public class User {
+
+@Column
+This annotation is used to map an instance field of the class to a 
+column in the database table, and it is must placed before the 
+getter method of the field. By default, Hibernate can implicitly 
+infer the mapping based on field name and field type of the class. 
+But if the field name and the corresponding column name are different, 
+we have to use this annotation explicitly. 
+ThisIn our model class, the field name id is different than the 
+column user_id, so we have to use the @Column annotation as follows:
+
+@Column(name = "USER_ID")
+public Integer getId() {
+    return id;
+}
+
+
+@Id
+This annotation specifies that a field is mapped to a primary key 
+column in the table. 
+Since the column user_id is a primary key, 
+we have to use this annotation as follows:
+
+@Column(name = "USER_ID")
+@Id
+public Integer getId() {
+    return id;
+}
+
+6.Create JPA Configuration File (persistence.xml)
+
+we need to create an XML configuration file for JPA called persistence.
+xml, in order to tell Hibernate how to connect to the database. 
+This file must be present in the classpath, under the META-INF folder.
+Under the src/main/resources folder, 
+create a new folder named META-INF 
+(Right-click, select New > Other… > Folder).
+
+<AFTER>
+
+The root element <persistence> specifies the version of JPA to be used,
+and as you can see, we use JPA version 2.1.
+
+The element <persistence-unit> specifies a unit of persistence with a 
+name. The name (UsersDB) will be looked up by Java code.
+
+Then we specify several properties for database connection information:
+
+- javax.persistence.jdbc.url: specifies the JDBC URL points to 
+								the database.
+
+- javax.persistence.jdbc.user: specifies the username of the 
+				account having privilege to access to the database.
+
+- javax.persistence.jdbc.password: specifies the password of the user.
+
+- javax.persistence.jdbc.driver: specifies the class name of the 
+		JDBC driver to be used. 
+		Here we use MySQL Connector Java so the name 
+		is com.mysql.cj.jdbc.Driver.
+
+- hibernate.show_sql: tells Hibernate to show SQL statements 
+		in standard output.
+
+- hibernate.format_sql: tells Hibernate to format the SQL statements.
+
+
+<IMPORTANT THINGS>
+EntityManager:
+An EntityManager instance is associated with a persistence context, 
+and it is used to interact with the database.
+
+A persistence context is a set of entity instances, which are 
+actually the objects or instances of the model classes.
+
+So we use the EntityManager to manage entity instances and 
+their life cycle, such as create entities, update entities, 
+remove entities, find and query entities.
+ 
+EntityManagerFactory:
+
+An EntityManagerFactory is used to create an EntityManager. 
+
+And EntityManagerFactory is associated with a persistence unit. 
+
+In Java SE environments, an EntityManagerFactory can be obtained 
+from the Persistence class.
+
+And here are the typical steps to manage entity instances via JPA:
+- Create an EntityManagerFactory from a persistence unit
+
+- Create an EntityManager from the EntityManagerFactory
+
+- Begin a transaction
+
+- Manage entity instances (create, update, remove, find, query, etc)
+
+- Commit the transaction
+
+- Close the EntityManager and EntityManagerFactory
+
+7.Test
+Now, let’s write some code to create, update, find, query 
+and remove User entity instances using JPA. 
+
+Create a new Java class under src/main/java folder called 
+UserDAOTest.java, with the main() method.
+
+
+Persist an entity instance:
+In the main() method, add the following code to create an 
+EntityManager and begin the transaction:
+
+EntityManagerFactory factory = Persistence.
+							createEntityManagerFactory("UsersDB");
+EntityManager entityManager = factory.createEntityManager();
+ 
+entityManager.getTransaction().begin();
+
+
+
+============persit(object)===========
+User newUser = new User();
+newUser.setEmail("billjoy@gmail.com");
+newUser.setFullname("bill Joy");
+newUser.setPassword("billi");
+ 
+entityManager.persist(newUser);
+
+persist(Object)  method of the EntityManager class to save the 
+User object to the underlying database.
+
+===========merge(Object)===============
+User existingUser = new User();
+existingUser.setId(1);
+existingUser.setEmail("bill.joy@gmail.com");
+existingUser.setFullname("Bill Joy");
+existingUser.setPassword("billionaire");
+ 
+entityManager.merge(existingUser);
+
+==========find(Class<T> entityClass, Object primaryKey)=========
+Integer primaryKey = 1;
+User user = entityManager.find(User.class, primaryKey);
+ 
+System.out.println(user.getEmail());
+System.out.println(user.getFullname());
+System.out.println(user.getPassword());
+
+=========================createQuery=========================
+Execute a query:
+The following code snippet shows you how to execute a query (JPQL):
+Java Persistence Query Language
+
+String sql = "SELECT u from User u where u.email = 'bill.joy@gmail.com'";
+Query query = entityManager.createQuery(sql);
+User user = (User) query.getSingleResult();
+ 
+System.out.println(user.getEmail());
+System.out.println(user.getFullname());
+System.out.println(user.getPassword());
+
+
+Note that the query looks similar to traditional SQL 
+syntax but it is not. The difference is JPQL operates against 
+entity instances (Java objects) rather than tables in database.
+
+====================remove()==================================
+Integer primaryKey = 1;	
+User reference = entityManager.getReference(User.class, primaryKey);
+entityManager.remove(reference);
+
+this code removes the User object with ID = 1 from the database, 
+first by looking up a reference based on the class type (User.class) 
+and primary key value (1), then remove the reference.
+============closing============================================
+As you can see, we need to specify the ID of the object and use the 
+(Object) method of the EntityManager class.
+
+And finally commit the transaction and close the
+EntityManager and EntityManagerFactory:
+
+entityManager.getTransaction().commit();
+entityManager.close();
+factory.close();
+
+
+REFERENCES DOC's
+EntityManagerFactory Javadoc
+https://docs.oracle.com/javaee/7/api/javax/persistence/EntityManagerFactory.html
+
+EntityManager
+https://docs.oracle.com/javaee/7/api/javax/persistence/EntityManager.html
+
+JPQL
+https://docs.oracle.com/html/E13946_04/ejb3_langref.html

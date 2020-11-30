@@ -1,0 +1,77 @@
+Eager fetch & Lazy fetch
+LAZY = fetch when needed
+Hibernate: 
+    select
+        student0_.id as id1_1_0_,
+        student0_.name as name2_1_0_,
+        student0_.passport_id as passport3_1_0_ 
+    from
+        students student0_ 
+    where
+        student0_.id=?
+Hibernate: 
+    select
+        passport0_.id as id1_0_0_,
+        passport0_.passportNumber as passport2_0_0_ 
+    from
+        student_passportDetails passport0_ 
+    where
+        passport0_.id=?
+		
+
+------------------------------------------------------------------------------
+EAGER = fetch immediately
+
+Hibernate: 
+    select
+        student0_.id as id1_1_0_,
+        student0_.name as name2_1_0_,
+        student0_.passport_id as passport3_1_0_,
+        passport1_.id as id1_0_1_,
+        passport1_.passportNumber as passport2_0_1_ 
+    from
+        students student0_ 
+    left outer join
+        student_passportDetails passport1_ 
+            on student0_.passport_id=passport1_.id 
+    where
+        student0_.id=?
+		
+		
+NOTE::
+The default behavior is to load ‘property values eagerly’ and to 
+load ‘collections lazily’.
+@OneToMany and @ManyToMany associations are defaulted to LAZY loading; 
+and @OneToOne and @ManyToOne are defaulted to EAGER loading. 
+This is important to remember to avoid any pitfall in future.
+
+
+-------------------------------------------------------------------------------------
+4. How lazy loading works in hibernate
+The simplest way that Hibernate can apply lazy load behavior upon the entities 
+and associations is by providing a proxy implementation of them. 
+Hibernate intercepts calls to the entity by substituting a proxy 
+for it derived from the entity’s class. 
+Where the requested information is missing, 
+it will be loaded from the database before control is 
+ceded to the parent entity’s implementation.
+
+Please note that when the association is represented as a collection class, 
+then a wrapper (essentially a proxy for the collection, 
+rather than for the entities that it contains) is created 
+and substituted for the original collection. 
+When you access this collection proxy then what you get 
+inside returned proxy collection are not proxy entities; 
+rather they are actual entities. You need not to put much 
+pressure on understanding this concept because on runtime it hardly matters.
+
+Effect of lazy loading on detached entities
+As we know that hibernate can only access the database via a session, 
+So If an entity is detached from the session and when we try to access 
+an association (via a proxy or collection wrapper) that has not yet been loaded, 
+Hibernate throws a LazyInitializationException.
+
+The cure is to ensure either that the entity is made persistent again 
+by attaching it to a session or that all of the fields that will be required 
+are accessed (so they are loaded into entity) before the entity is detached 
+from the session.

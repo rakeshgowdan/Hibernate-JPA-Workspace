@@ -1,0 +1,9 @@
+Association Mapping Types :
+
+1.   One-to-One :   Mapping one-to-one relationship using Hibernate
+
+2.   One-to-Many : Mapping one-to-many relationship using Hibernate
+
+3.   Many-to-One : Mapping many-to-one relationship using Hibernate
+
+4.   Many-to-Many :Mapping many-to-many relationship using Hibernate

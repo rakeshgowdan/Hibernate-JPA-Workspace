@@ -1,0 +1,7 @@
+commons errors & resolve
+
+https://www.baeldung.com/hibernate-no-persistence-provider
+
+All Jpa Exceptions
+
+https://www.objectdb.com/api/java/jpa/exceptions

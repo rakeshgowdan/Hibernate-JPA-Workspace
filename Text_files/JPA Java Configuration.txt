@@ -1,0 +1,22 @@
+public class MyJPADAO implements AutoCloseable {
+  private EntityManagerFactory emf=null;
+  EntityManager em=null;
+  {
+    Map<String, String> props = new HashMap<>();
+    props.put("hibernate.dialect", "org.hibernate.dialect.HSQLDialect");
+    props.put("hibernate.connection.driver_class", "org.hsqldb.jdbcDriver");
+    props.put("hibernate.connection.url", "jdbc:hsqldb:mem:myFavoriteDB");
+    props.put("hibernate.connection.username", "somebody");
+    props.put("hibernate.connection.password", "IWillNotTellYou");
+    props.put("hibernate.hbm2ddl.auto", "update");
+    props.put("hibernate.show_sql", "true");
+    emf = Persistence.createEntityManagerFactory("myFavoriteDBUnit", props);
+    em = emf.createEntityManager();
+  }
+  
+  @Override
+  public void close() throws Exception {
+    if (null != em) em.close();  // try-catch omitted for brevity
+    if (null != em) emf.close(); // try-catch omitted for brevity
+  }
+}
